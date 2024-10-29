@@ -1,0 +1,38 @@
+spring:
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+      routes:
+      - id: movie-service
+        uri: lb://movie-service
+        predicates:
+          - Path=/api/movie/**
+          # las cookies se deben enviar en postman para la prueba, guion al mismo nivel de Path
+          - Cookie=cookie1,cookievalue1
+#          - Cookie=cookie2,cookievalue2
+          #permitir solicitudes antes o despues de la fecha
+#          - After=2024-10-16T11:58:20.789-05:00[America/Lima]
+#          - Before=2024-10-16T12:03:40.789-05:00[America/Lima]
+#          - Between=2024-10-16T12:11:20.789-05:00[America/Lima], 2024-10-16T12:13:20.789-05:00[America/Lima]
+          - Header=APIKEY, 12345
+#          - Header=TOKEN, 45678
+          - Method=GET, POST, PUT
+        filters:
+          - StripPrefix=2
+          - AddRequestHeader=header-added, valuetest
+          - AddResponseHeader=header-response, valuetestresponse
+          #modificar cabeceras de request y responses
+#          - SetRequestHeader=APIKEY, 123
+          - SetResponseHeader=Content-Type, text/plain
+          - RemoveRequestHeader=APIKEY
+          - RemoveResponseHeader=Date
+          - AddRequestParameter=color, rojo, zona, lima
+          - AddRequestParameter=zona, lima
+      - id: reviews-service
+        uri: lb://reviews-service
+        predicates:
+          - Path=/api/reviews/**
+        filters:
+          - StripPrefix=2
